@@ -41,4 +41,17 @@ public class CreateReceiptRequestTest {
         validator.validate(receipt);
         assertThat(validator.validate(receipt), hasSize(1));
     }
+
+    @Test
+    public void testMissingType() {
+        CreateReceiptRequest receipt = new CreateReceiptRequest();
+        receipt.merchant = "OK";
+        receipt.amount = new BigDecimal(33.44);
+
+        //receipt.receipt_type = new Integer (2);
+
+        assertThat(validator.validate(receipt), empty());
+    }
+
+
 }

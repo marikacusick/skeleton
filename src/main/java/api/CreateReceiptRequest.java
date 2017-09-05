@@ -17,4 +17,8 @@ public class CreateReceiptRequest {
     public String merchant;
 
     public BigDecimal amount;
+
+    public Integer receipt_type;
+
+
 }
