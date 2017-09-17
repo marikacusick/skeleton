@@ -16,7 +16,5 @@ CREATE TABLE tags (
 
   PRIMARY KEY(tag_name,id)
 
-
-
 );
 

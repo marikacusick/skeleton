@@ -2,58 +2,384 @@
 <html>
 
 <head>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css">
     <script data-require="jquery@*" data-semver="3.1.1" src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <style>
-        #container {border: 1px solid brown;}
-        H1 {float: left;}
+        #container {border: 1px solid white;}
 
-        .button{
-            background-color:#55A;
-            border: 1px solid #229;
+        H1 {
+            float: left;
+            font-family: arial, sans-serif
+        }
+
+        H2{
+            float:left;
+            font-family:arial, sans-serif;
+            width:25%;
+            background-color:#ADD8E6;
+            display: inline-block;
+            text-align: center;
+
+        }
+
+        .header{
+            font-family:arial, sans-serif;
+            background-color:#ADD8E6;
+            border:1px solid #000000;
+            display: inline-block;
+            width:100px;
+        }
+
+        #add_receipt{
+            background-color:#FFA500;
+            border: 1px solid #000000;
             width: 100px;
             float: right;
             font-size: 2em;
             color: white;
             text-align: center;
+            border-radius: 8px;
+        }
+
+        #receiptForm{
+            clear:both;
+        table, th, td {
+            border: 1px solid black;
+        }
         }
 
         #receiptList {
-            border: 1px solid green;
+            overflow:hidden;
+            position:relative;
+            border: 1px solid #000000;
+            clear: both;
+            font-family: arial, sans-serif;
+        }
+
+
+        .receipt{
+            overflow:hidden;
+            background-color: #ADD8E6;
+            border: 1px solid #000000;
+        }
+
+
+        .time{
+            background-color: #ADD8E6;
+            float: left;
+            width:25%;
+            text-align: center;
+        }
+
+        .merchant{
+            background-color: #ADD8E6;
+            float: left;
+            width:25%;
+            text-align: center;
+
+        }
+
+        .value{
+            background-color: #ADD8E6;
+            float:left;
+            width:25%;
+            text-align: center;
+        }
+
+        .tags{
+            background-color: #ADD8E6;
+            float:left;
+            width:25%;
+            text-align: center;
+        }
+
+        .add-tag{
+            background-color:#6495ED;
+            border: 1px solid #000000;
+            width: 20%
+            float: right;
+            color: white;
+            text-align: center;
+            border-radius: 8px;
+
+        }
+
+        #dropDown{
+            overflow:hidden;
+            background-color: #FFA500;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            visibility: hidden;
             clear: both;
         }
 
-        .receipt {
-            background-color: #eee;
-            margin-bottom: 5px;
+        #tagDropDown{
+            overflow:hidden;
+            background-color: #A9A9A9;
+            border: 1px solid #ccc;
+            width: 50%;
+            border-radius: 4px;
+            clear: both;
+            visibility: hidden;
         }
 
+
+        input[id=amount], select {
+            clear:both;
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+
+        input[id=merchant], select {
+            clear:both;
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        input[id=tag_input], select {
+            clear:both;
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        input[id=receiptID], select {
+            clear:both;
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            visibility:hidden;
+        }
+
+
+
+        #cancel{
+            float:left;
+            width: 30%;
+            background-color: #FF0000;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: center;
+
+        }
+
+        #save {
+            float:right;
+            width: 30%;
+            background-color: #4CAF50;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+
+
     </style>
+
     <script>
         // This is the idiomatic way to ensure that JQuery does not
         // execute until the page has loaded
+
         $(function(){
-            const api = ""; // <- do not need a root api URL if this page is served directly by the API
+            getAllReceipts();
+        })
+
+        function addReceipt(){
+            var x = document.getElementById('dropDown');
+            x.style.visibility = 'visible';
+        }
+
+        function saveReceipt(){
+            const api = "http://ec2-13-59-58-183.us-east-2.compute.amazonaws.com:8080";
+
+            $.ajaxSetup({
+                contentType: "application/json; charset=utf-8"
+            });
+
+            var dropDown = document.getElementById('dropDown');
+            var merchant = document.getElementById('merchant').value;
+            var amount = document.getElementById('amount').value;
+
+            var data = JSON.stringify({
+                merchant: `${merchant}`,  amount: `${amount}`
+            });
+            $.post(api + "/receipts", data, function(response) {
+                $(`<div id = ${response}, class = "receipt">
+              <div class="time">${receipt.created}</div>
+              <div class ="merchant">${receipt.merchantName}</div>
+              <div class ="value">${receipt.value}</div>
+              <div id = "tags-${response}" , class = "tags">
+                <button class = "add-tag", onclick="tagInput(${response})">Add</button>
+                ${tags}
+              </div>
+
+            </div>`
+                )
+                    .prependTo($("#receiptList"));
+            });
+
+            dropDown.style.visibility = 'hidden';
+
+        }
+
+        function cancelReceipt(){
+            var dropDown = document.getElementById('dropDown');
+            dropDown.style.visibility = 'hidden';
+
+        }
+
+        function tagInput(receiptID){
+            var dropDown = document.getElementById('tagDropDown');
+            dropDown.style.visibility = 'visible';
+            document.getElementById('receiptID').value = receiptID;
+        }
+
+        function addTag(){
+            const api = "http://localhost:8080";
+            //const api = "http://ec2-13-59-58-183.us-east-2.compute.amazonaws.com:8080";
+            //"http://ec2-13-59-58-183.us-east-2.compute.amazonaws.com:8080";
+
+            $.ajaxSetup({
+                contentType: "application/json; charset=utf-8"
+            });
+
+            var tag = document.getElementById('tag_input').value;
+            var id = document.getElementById('receiptID').value;
+
+            $.ajax({
+                url: api + '/tags/' + tag,
+                type: 'PUT',
+                data: JSON.stringify(id),
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                success: function(response){
+                    $(`<button id = "${id}_${tag}", class = "Tag", onClick = "toggleTag(\'${tag}\', ${id})">${tag}</button>`)
+                        .appendTo(document.getElementById("tags-" + id));
+
+                }
+            })
+
+            var dropDown = document.getElementById('tagDropDown');
+            dropDown.style.visibility = 'hidden';
+
+        }
+
+        function toggleTag(tagName, receiptID){
+            const api = "http://localhost:8080";
+            //const api = "http://ec2-13-59-58-183.us-east-2.compute.amazonaws.com:8080";
+
+
+            $.ajax({
+                url: api + '/tags/' + tagName,
+                type: 'PUT',
+                data: JSON.stringify(receiptID),
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                success: function(response){
+                    var tagid = receiptID + "_" + tagName
+                    var receipt = document.getElementById(tagid);
+                    receipt.remove();
+                }
+            })
+
+        }
+
+        function getAllReceipts(){
+            const api = "http://localhost:8080";
+            //const api = "http://ec2-13-59-58-183.us-east-2.compute.amazonaws.com:8080";
 
             $.getJSON(api+"/receipts", function(receipts){
-                for(var i=0; i < receipts.length; i++) {
+                for(var i = receipts.length-1 ; i >= 0; i--) {
                     var receipt = receipts[i];
-                    $(`<div class="receipt">${receipt.merchantName}<div><span class="receiptTag">t1</span></div></div>`)
+                    var tags = "";
+                    for (var tag in receipt.tags){
+                        var thistag = receipt.tags[tag];
+                        tags += `<button class = "Tag", id= "${receipt.id}_${thistag}", onclick = "toggleTag(\'${thistag}\', ${receipt.id})">${thistag}</button>`
+                    }
+
+                    $(`<div id = ${receipt.id}, class = "receipt">
+              <div class="time">${receipt.created}</div>
+              <div class ="merchant">${receipt.merchantName}</div>
+              <div class ="value">${receipt.value}</div>
+              <div id = "tags-${receipt.id}" , class = "tags">
+                <button class = "add-tag", onclick="tagInput(${receipt.id})">Add</button>
+                ${tags}
+              </div>
+            </div>`
+                    )
                         .appendTo($("#receiptList"));
+
                 }
 
             })
-        })
+
+        }
+
+
+
+
     </script>
+
 </head>
 
 <body>
-<DIV id="container">
+<DIV id = "container">
     <h1>My receipts</h1>
-    <div class="button">+</div>
-    <div id="receiptList">
+    <button id="add_receipt" onclick="addReceipt()">+</button>
+
+    <div id = "dropDown">
+        <input id="merchant" name="merchantName" placeholder="merchant">
+        <input id="amount"  name="amount" placeholder="amount">
+        <button id="cancel" onclick="cancelReceipt()">Cancel</button>
+        <button id="save" onclick="saveReceipt()">Save</button>
     </div>
+
+    <div id = "tagDropDown">
+        <input id = "receiptID">
+        <input id="tag_input" name="tagName" placeholder="tag name?">
+        <button id = "enter" onclick = "addTag()">Enter</button>
+    </div>
+
+
+
+
+    <div id = "receiptForm"></div>
+    <h2>Time</h2>
+    <h2>Merchant</h2>
+    <h2>$</h2>
+    <h2>Tags</h2>
+</div>
+<DIV id= "receiptList">
 </DIV>
 </body>
 
-</html>
+</html>tml>
