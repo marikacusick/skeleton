@@ -216,7 +216,7 @@
         }
 
         function saveReceipt(){
-            const api = "http://localhost:8080";
+            const api = "http://ec2-52-15-221-191.us-east-2.compute.amazonaws.com:8080";
             //const api = "http://ec2-13-59-58-183.us-east-2.compute.amazonaws.com:8080";
 
             $.ajaxSetup({
@@ -267,7 +267,7 @@
         }
 
         function saveTag(event, receiptID){
-            const api = "http://localhost:8080";
+            const api = "http://ec2-52-15-221-191.us-east-2.compute.amazonaws.com:8080";
             //const api = "http://ec2-13-59-58-183.us-east-2.compute.amazonaws.com:8080";
             //"http://ec2-13-59-58-183.us-east-2.compute.amazonaws.com:8080";
 
@@ -305,7 +305,7 @@
         }
 
         function toggleTag(tagName, receiptID){
-            const api = "http://localhost:8080";
+            const api = "http://ec2-52-15-221-191.us-east-2.compute.amazonaws.com:8080";
             //const api = "http://ec2-13-59-58-183.us-east-2.compute.amazonaws.com:8080";
 
 
@@ -326,7 +326,7 @@
         }
 
         function getAllReceipts(){
-            const api = "http://localhost:8080";
+            const api = "http://ec2-52-15-221-191.us-east-2.compute.amazonaws.com:8080";
             //const api = "http://ec2-13-59-58-183.us-east-2.compute.amazonaws.com:8080";
 
             $.getJSON(api+"/receipts", function(receipts){
