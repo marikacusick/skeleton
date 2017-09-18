@@ -79,7 +79,7 @@
 
         }
 
-        .value{
+        .amount{
             background-color: #ADD8E6;
             float:left;
             width:25%;
@@ -243,7 +243,7 @@
                     $(`<div id = ${response} class="receipt">
               <div class="time">1s ago</div>
               <div class ="merchant">${merchant}</div>
-              <div class ="value">${amount}</div>
+              <div class ="amount">${amount}</div>
               <div id = "tags-${response}" , class = "tagValue">
                 <button class = "add-tag", onclick="addTag(${response})">Add</button>
                 </div>
@@ -341,7 +341,7 @@
                     $(`<div id = "${receipt.id}", class = "receipt">
               <div class="time">${receipt.created}</div>
               <div class ="merchant">${receipt.merchantName}</div>
-              <div class ="value">${receipt.value}</div>
+              <div class ="amount">${receipt.value}</div>
               <div id = "tags-${receipt.id}" , class = "tagValue">
                 <button class = "add-tag", onclick="addTag(${receipt.id})">Add</button>
                 ${tags}
