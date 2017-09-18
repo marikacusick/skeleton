@@ -30,7 +30,7 @@
             width:100px;
         }
 
-        #add_receipt{
+        #add-receipt{
             background-color:#FFA500;
             border: 1px solid #000000;
             width: 100px;
@@ -86,8 +86,7 @@
             text-align: center;
         }
 
-        .tags{
-            background-color: #ADD8E6;
+        .tagValue{
             float:left;
             width:25%;
             text-align: center;
@@ -172,7 +171,7 @@
 
 
 
-        #cancel{
+        #cancel-receipt{
             float:left;
             width: 30%;
             background-color: #FF0000;
@@ -186,7 +185,7 @@
 
         }
 
-        #save {
+        #save-receipt{
             float:right;
             width: 30%;
             background-color: #4CAF50;
@@ -217,7 +216,8 @@
         }
 
         function saveReceipt(){
-            const api = "http://ec2-13-59-58-183.us-east-2.compute.amazonaws.com:8080";
+            const api = "http://localhost:8080";
+            //const api = "http://ec2-13-59-58-183.us-east-2.compute.amazonaws.com:8080";
 
             $.ajaxSetup({
                 contentType: "application/json; charset=utf-8"
@@ -230,20 +230,26 @@
             var data = JSON.stringify({
                 merchant: `${merchant}`,  amount: `${amount}`
             });
-            $.post(api + "/receipts", data, function(response) {
-                $(`<div id = ${response}, class = "receipt">
-              <div class="time">${receipt.created}</div>
-              <div class ="merchant">${receipt.merchantName}</div>
-              <div class ="value">${receipt.value}</div>
-              <div id = "tags-${response}" , class = "tags">
-                <button class = "add-tag", onclick="tagInput(${response})">Add</button>
-                ${tags}
-              </div>
 
-            </div>`
-                )
-                    .prependTo($("#receiptList"));
-            });
+
+            $.ajax({
+                url: api + '/receipts/',
+                type: 'POST',
+                data: data,
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                success: function(response){
+                    $(`<div id = ${response} class="receipt">
+              <div class="time">1s ago</div>
+              <div class ="merchant">${merchant}</div>
+              <div class ="value">${amount}</div>
+              <div id = "tags-${response}" , class = "tagValue">
+                <button class = "add-tag", onclick="addTag(${response})">Add</button>
+                </div>
+            </div>`).prependTo($("#receiptList"));
+                }
+            })
 
             dropDown.style.visibility = 'hidden';
 
@@ -255,34 +261,40 @@
 
         }
 
-        function tagInput(receiptID){
-            var dropDown = document.getElementById('tagDropDown');
-            dropDown.style.visibility = 'visible';
-            document.getElementById('receiptID').value = receiptID;
+        function addTag(receiptID){
+            $(`<input id = "tag-input-${receiptID}", class = "tag_input", onkeyup = "saveTag(event, ${receiptID})", placeholder = "tag name?"/>`)
+                .appendTo(document.getElementById(receiptID));
         }
 
-        function addTag(){
+        function saveTag(event, receiptID){
             const api = "http://localhost:8080";
             //const api = "http://ec2-13-59-58-183.us-east-2.compute.amazonaws.com:8080";
             //"http://ec2-13-59-58-183.us-east-2.compute.amazonaws.com:8080";
+
+            event.which = event.which || event.keyCode;
+            if (event.which!=13){
+                return;
+            }
 
             $.ajaxSetup({
                 contentType: "application/json; charset=utf-8"
             });
 
-            var tag = document.getElementById('tag_input').value;
-            var id = document.getElementById('receiptID').value;
+            var tag = document.getElementById("tag-input-"+receiptID);
+            var tag_value = tag.value;
 
             $.ajax({
-                url: api + '/tags/' + tag,
+                url: api + '/tags/' + tag_value,
                 type: 'PUT',
-                data: JSON.stringify(id),
+                data: JSON.stringify(receiptID),
                 headers: {
                     "Content-Type": "application/json"
                 },
                 success: function(response){
-                    $(`<button id = "${id}_${tag}", class = "Tag", onClick = "toggleTag(\'${tag}\', ${id})">${tag}</button>`)
-                        .appendTo(document.getElementById("tags-" + id));
+                    $(`<button id = "${tag_value},${receiptID}", class = "tagValue", onClick = "toggleTag(\'${tag_value}\', ${receiptID})">${tag_value}</button>`)
+                        .appendTo(document.getElementById("tags-" + receiptID));
+
+                    tag.remove();
 
                 }
             })
@@ -305,7 +317,7 @@
                     "Content-Type": "application/json"
                 },
                 success: function(response){
-                    var tagid = receiptID + "_" + tagName
+                    var tagid = tagName + "," + receiptID
                     var receipt = document.getElementById(tagid);
                     receipt.remove();
                 }
@@ -323,15 +335,15 @@
                     var tags = "";
                     for (var tag in receipt.tags){
                         var thistag = receipt.tags[tag];
-                        tags += `<button class = "Tag", id= "${receipt.id}_${thistag}", onclick = "toggleTag(\'${thistag}\', ${receipt.id})">${thistag}</button>`
+                        tags += `<button class = "tagValue", id= "${thistag},${receipt.id}", onclick = "toggleTag(\'${thistag}\', ${receipt.id})">${thistag}</button>`
                     }
 
-                    $(`<div id = ${receipt.id}, class = "receipt">
+                    $(`<div id = "${receipt.id}", class = "receipt">
               <div class="time">${receipt.created}</div>
               <div class ="merchant">${receipt.merchantName}</div>
               <div class ="value">${receipt.value}</div>
-              <div id = "tags-${receipt.id}" , class = "tags">
-                <button class = "add-tag", onclick="tagInput(${receipt.id})">Add</button>
+              <div id = "tags-${receipt.id}" , class = "tagValue">
+                <button class = "add-tag", onclick="addTag(${receipt.id})">Add</button>
                 ${tags}
               </div>
             </div>`
@@ -354,23 +366,14 @@
 <body>
 <DIV id = "container">
     <h1>My receipts</h1>
-    <button id="add_receipt" onclick="addReceipt()">+</button>
+    <button id="add-receipt" onclick="addReceipt()">+</button>
 
     <div id = "dropDown">
         <input id="merchant" name="merchantName" placeholder="merchant">
         <input id="amount"  name="amount" placeholder="amount">
-        <button id="cancel" onclick="cancelReceipt()">Cancel</button>
-        <button id="save" onclick="saveReceipt()">Save</button>
+        <button id="cancel-receipt" onclick="cancelReceipt()">Cancel</button>
+        <button id="save-receipt" onclick="saveReceipt()">Save</button>
     </div>
-
-    <div id = "tagDropDown">
-        <input id = "receiptID">
-        <input id="tag_input" name="tagName" placeholder="tag name?">
-        <button id = "enter" onclick = "addTag()">Enter</button>
-    </div>
-
-
-
 
     <div id = "receiptForm"></div>
     <h2>Time</h2>
@@ -378,8 +381,7 @@
     <h2>$</h2>
     <h2>Tags</h2>
 </div>
-<DIV id= "receiptList">
-</DIV>
+<DIV id= "receiptList"></DIV>
 </body>
 
-</html>tml>
+</html>
