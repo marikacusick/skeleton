@@ -56,6 +56,11 @@
             font-family: arial, sans-serif;
         }
 
+        .tags{
+            float:left;
+            width:25%;
+            text-align: center;
+        }
 
         .receipt{
             overflow:hidden;
@@ -244,7 +249,7 @@
               <div class="time">1s ago</div>
               <div class ="merchant">${merchant}</div>
               <div class ="amount">${amount}</div>
-              <div id = "tags-${response}" , class = "tagValue">
+              <div id = "tags-${response}", class = "tags">
                 <button class = "add-tag", onclick="addTag(${response})">Add</button>
                 </div>
             </div>`).prependTo($("#receiptList"));
@@ -298,10 +303,6 @@
 
                 }
             })
-
-            var dropDown = document.getElementById('tagDropDown');
-            dropDown.style.visibility = 'hidden';
-
         }
 
         function toggleTag(tagName, receiptID){
@@ -342,7 +343,7 @@
               <div class="time">${receipt.created}</div>
               <div class ="merchant">${receipt.merchantName}</div>
               <div class ="amount">${receipt.value}</div>
-              <div id = "tags-${receipt.id}" , class = "tagValue">
+              <div id = "tags-${receipt.id}",class = "tags">
                 <button class = "add-tag", onclick="addTag(${receipt.id})">Add</button>
                 ${tags}
               </div>
