@@ -8,6 +8,8 @@ import java.util.Base64;
 import java.util.Collections;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+
+import javafx.util.converter.BigDecimalStringConverter;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import static java.lang.System.out;
@@ -51,10 +53,27 @@ public class ReceiptImageController {
             // Your Algo Here!!
             // Sort text annotations by bounding polygon.  Top-most non-decimal text is the merchant
             // bottom-most decimal text is the total amount
+
+            if (res.getTextAnnotationsList().size()==0){
+                return new ReceiptSuggestionResponse(merchantName, amount);
+            }
+
+
             for (EntityAnnotation annotation : res.getTextAnnotationsList()) {
                 out.printf("Position : %s\n", annotation.getBoundingPoly());
                 out.printf("Text: %s\n", annotation.getDescription());
             }
+
+            EntityAnnotation full = res.getTextAnnotationsList().get(0);
+            String text = full.getDescription();
+            String lines[] = text.split("\\r?\\n");
+
+            merchantName = lines[0];
+
+            String last_line = lines[lines.length-1];
+            String last_lines [] = last_line.split(" ");
+
+            amount = new BigDecimal(last_lines[last_lines.length-1]);
 
             //TextAnnotation fullTextAnnotation = res.getFullTextAnnotation();
             return new ReceiptSuggestionResponse(merchantName, amount);
