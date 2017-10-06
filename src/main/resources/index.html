@@ -288,9 +288,8 @@
             // create a CANVAS element that is same size as the image
             imageCapture.grabFrame()
             //imageCapture.takePhoto()
-
-                .then(blob => createImageBitmap(blob))
-        .then(img => {
+             .then(blob => createImageBitmap(blob))
+            .then(img => {
                 var canvas = document.createElement('canvas');
             canvas.width = img.width;
             canvas.height = img.height;
