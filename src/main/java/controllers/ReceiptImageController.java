@@ -8,8 +8,10 @@ import java.util.Base64;
 import java.util.Collections;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import java.util.List;
+import java.util.ArrayList;
 
-import javafx.util.converter.BigDecimalStringConverter;
+
 import org.hibernate.validator.constraints.NotEmpty;
 
 import static java.lang.System.out;
@@ -64,18 +66,35 @@ public class ReceiptImageController {
                 out.printf("Text: %s\n", annotation.getDescription());
             }
 
+            //merchant name
+
             EntityAnnotation full = res.getTextAnnotationsList().get(0);
             String text = full.getDescription();
             String lines[] = text.split("\\r?\\n");
 
             merchantName = lines[0];
 
-            String last_line = lines[lines.length-1];
-            String last_lines [] = last_line.split(" ");
 
-            amount = new BigDecimal(last_lines[last_lines.length-1]);
+            List <BigDecimal> numbers = new ArrayList<>();
+            List <EntityAnnotation> list_annotations = res.getTextAnnotationsList();
+            BigDecimal test;
 
-            //TextAnnotation fullTextAnnotation = res.getFullTextAnnotation();
+            for (int i=1; i <res.getTextAnnotationsList().size(); i++){
+                String txt = list_annotations.get(i).getDescription();
+                System.out.println(txt);
+                try{
+                    test = new BigDecimal(txt);
+                    numbers.add(test);
+                    System.out.println("list of numbers" + numbers);
+                }
+                catch(Exception e){
+                    System.out.println("not a number");
+                }
+            }
+
+            amount = numbers.get(numbers.size()-1);
+
+
             return new ReceiptSuggestionResponse(merchantName, amount);
         }
     }
